@@ -33,7 +33,7 @@ export const getCartItems = () => api.get("/cart/items");
 
 export const createOrder = (orderData) => api.post("/order", orderData);
 
-export const getOrders = (orderData) => api.post("/order", orderData);
-export const getProduct = (orderData) => api.post("/order", orderData);
+export const getOrders = (orderData) => api.get("/orders");
+export const getProduct = (orderData) => api.post("/product", orderData);
 
 export default api;

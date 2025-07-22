@@ -5,6 +5,8 @@ import { loginUser } from "../../services/api";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, Box, Typography } from "@mui/material";
+import toast from "react-hot-toast";
+import { TOAST_PROPS } from "../../constant";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -20,6 +22,7 @@ const LoginPage = () => {
     try {
       const response = await loginUser(values);
       login(response.data.token);
+      toast.success("Login successfull !", TOAST_PROPS.success);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

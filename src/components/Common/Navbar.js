@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button, Box, Badge } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
+import { TOAST_PROPS } from "../../constant";
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, isSeller } = useAuth();
@@ -9,7 +11,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    toast.error("Logged Out", TOAST_PROPS.error);
   };
 
   return (

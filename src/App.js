@@ -1,12 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import AuthProvider from "./context/AuthContext";
 import PrivateRoute from "./routes/PrivateRoute";
 import HomePage from "./pages/Home";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
-// import ProductListPage from "./pages/Product/List";
 import ProductCreatePage from "./pages/Product/Create";
 import ProductEditPage from "./pages/Product/Edit";
 import CartPage from "./pages/Cart";
