@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button, Box, Badge } from "@mui/material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { TOAST_PROPS } from "../../constant";
+import { FiShoppingCart } from "react-icons/fi";
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, isSeller } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -15,56 +13,78 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+    <nav className="bg-blue-600 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <Link to="/" className="text-xl font-bold hover:text-blue-200">
             E-Commerce
           </Link>
-        </Typography>
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} to="/products">
-            Products
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/products"
+              className="hover:text-blue-200 transition duration-150"
+            >
+              Products
+            </Link>
 
-          {isAuthenticated() && (
-            <>
-              <Button color="inherit" component={Link} to="/cart">
-                <Badge badgeContent={0} color="error">
-                  <ShoppingCartIcon />
-                </Badge>
-              </Button>
+            {isAuthenticated() && (
+              <>
+                <Link
+                  to="/cart"
+                  className="relative hover:text-blue-200 transition duration-150"
+                >
+                  <FiShoppingCart className="text-xl" />
+                  <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full px-1">
+                    0
+                  </span>
+                </Link>
 
-              {isSeller() && (
-                <Button color="inherit" component={Link} to="/seller/orders">
-                  Seller Dashboard
-                </Button>
-              )}
+                {isSeller() && (
+                  <Link
+                    to="/seller/orders"
+                    className="hover:text-blue-200 transition duration-150"
+                  >
+                    Seller Dashboard
+                  </Link>
+                )}
 
-              <Button color="inherit" component={Link} to="/profile">
-                Profile
-              </Button>
+                <Link
+                  to="/profile"
+                  className="hover:text-blue-200 transition duration-150"
+                >
+                  Profile
+                </Link>
 
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          )}
+                <button
+                  onClick={handleLogout}
+                  className="hover:text-blue-200 transition duration-150"
+                >
+                  Logout
+                </button>
+              </>
+            )}
 
-          {!isAuthenticated() && (
-            <>
-              <Button color="inherit" component={Link} to="/login">
-                Login
-              </Button>
-              <Button color="inherit" component={Link} to="/register">
-                Register
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+            {!isAuthenticated() && (
+              <>
+                <Link
+                  to="/login"
+                  className="hover:text-blue-200 transition duration-150"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="hover:text-blue-200 transition duration-150"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 
