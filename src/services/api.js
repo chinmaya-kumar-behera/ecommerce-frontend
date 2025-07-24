@@ -28,12 +28,30 @@ export const updateProduct = (productId, productData) =>
   api.put(`/product/${productId}`, productData);
 export const getSellerOrders = () => api.get("/product/seller");
 
-export const addToCart = (cartData) => api.post("/cart", cartData);
-export const getCartItems = () => api.get("/cart/items");
 
 export const createOrder = (orderData) => api.post("/order", orderData);
 
 export const getOrders = (orderData) => api.get("/orders");
-export const getProduct = (orderData) => api.post("/product", orderData);
+export const getProductById = (productId) => api.get(`/product/${productId}`);
+
+// cart services
+export const addToCart = (cartData) => api.post("/cart", cartData);
+export const getCartItems = () => api.get("/cart/items");
+
+// services/api.js
+
+export const getReviewsByProductId = async (productId) => {
+  const response = await axios.get(`/api/reviews/product/${productId}`);
+  return response;
+};
+
+export const addReview = async (productId, reviewData) => {
+  const response = await axios.post(`/api/reviews/product/${productId}`, reviewData, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+  return response;
+};
 
 export default api;

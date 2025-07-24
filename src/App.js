@@ -16,6 +16,7 @@ import UnauthorizedPage from "./pages/Unauthorized";
 import Navbar from "./components/Common/Navbar";
 import ProductListPage from "./pages/Product/List";
 import { AuthProvider } from "./context/AuthContext";
+import ProductDetail from "./pages/Product/ProductDetail";
 
 function App() {
   return (
@@ -27,11 +28,12 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
 
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/checkout/:id" element={<CheckoutPage />} />
             <Route path="/orders" element={<OrdersPage />} />
           </Route>
 

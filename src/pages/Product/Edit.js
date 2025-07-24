@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProduct, updateProduct } from "../../services/api";
+import { getProductById, updateProduct } from "../../services/api";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { TextField, Button, Box, Typography } from "@mui/material";
@@ -15,7 +15,7 @@ const ProductEditPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await getProduct(id);
+        const response = await getProductById(id);
         setProduct(response.data);
       } catch (err) {
         console.error("Error fetching product:", err);

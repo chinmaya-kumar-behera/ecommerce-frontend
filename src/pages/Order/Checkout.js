@@ -1,70 +1,97 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { createOrder, getCartItems } from "../../services/api";
+import { useNavigate, useParams } from "react-router-dom";
+import { createOrder, getProductById } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import {
   Box,
   Typography,
   Button,
-  TextField,
   Card,
   CardContent,
-  FormControlLabel,
-  Checkbox,
   Grid,
+  TextField,
 } from "@mui/material";
+import { toast } from "react-toastify";
 
 const CheckoutPage = () => {
-  const [cart, setCart] = useState(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState("credit_card");
-  const [shippingAddress, setShippingAddress] = useState("");
-  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
-  const [billingAddress, setBillingAddress] = useState("");
-  const { user } = useAuth();
+  const [quantity, setQuantity] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchProduct = async () => {
       try {
-        const response = await getCartItems();
-        setCart(response.data.getdata);
+        const response = await getProductById(id);
+        setProduct(response.data.Product);
       } catch (err) {
-        console.error("Error fetching cart:", err);
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchCart();
-  }, []);
 
-  const handleSubmit = async () => {
+    fetchProduct();
+  }, [id]);
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (value > 0 && value <= (product?.stock || 1)) {
+      setQuantity(value);
+    }
+  };
+
+  const incrementQuantity = () => {
+    if (quantity < (product?.stock || 1)) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  console.log("user state", isAuthenticated);
+  const handlePlaceOrder = async () => {
     try {
+      if (!isAuthenticated()) {
+        navigate("/login");
+        return;
+      }
+
       const orderData = {
-        products: cart.items.map((item) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-        })),
+        products: [
+          {
+            product_id: product._id,
+            quantity: quantity,
+          },
+        ],
         payment_method: paymentMethod,
         payment_status: "pending",
         order_status: "processing",
       };
 
       const response = await createOrder(orderData);
-      navigate(`/orders/${response.data.data._id}`);
+      if(response.status === 200) {
+        toast.success("Order placed successfully!");
+        // navigate(`/orders/${response.data.data._id}`);
+      }
     } catch (err) {
       console.error("Error creating order:", err);
     }
   };
 
   if (loading) return <Typography>Loading...</Typography>;
-  if (!cart || cart.items.length === 0)
-    return <Typography>Your cart is empty</Typography>;
+  if (!product) return <Typography>Product not found</Typography>;
 
-  const total = cart.items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const discountedPrice =
+    product.price - product.price * (product.discount / 100);
+  const total = (discountedPrice * quantity).toFixed(2);
 
   return (
     <Box>
@@ -77,39 +104,50 @@ const CheckoutPage = () => {
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Shipping Address
+                Product Details
               </Typography>
-              <TextField
-                label="Shipping Address"
-                fullWidth
-                margin="normal"
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-                multiline
-                rows={3}
-              />
-
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={billingSameAsShipping}
-                    onChange={(e) => setBillingSameAsShipping(e.target.checked)}
-                  />
-                }
-                label="Billing address same as shipping"
-              />
-
-              {!billingSameAsShipping && (
-                <TextField
-                  label="Billing Address"
-                  fullWidth
-                  margin="normal"
-                  value={billingAddress}
-                  onChange={(e) => setBillingAddress(e.target.value)}
-                  multiline
-                  rows={3}
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    objectFit: "contain",
+                    marginRight: 16,
+                  }}
                 />
-              )}
+                <Box>
+                  <Typography variant="subtitle1">{product.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {product.brand}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Typography sx={{ mr: 2 }}>Quantity:</Typography>
+                <Button onClick={decrementQuantity} disabled={quantity <= 1}>
+                  -
+                </Button>
+                <TextField
+                  type="number"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  inputProps={{ min: 1, max: product.stock }}
+                  sx={{ width: 80, mx: 1 }}
+                />
+                <Button
+                  onClick={incrementQuantity}
+                  disabled={quantity >= product.stock}
+                >
+                  +
+                </Button>
+              </Box>
+
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Available: {product.stock} units
+              </Typography>
             </CardContent>
           </Card>
 
@@ -153,23 +191,40 @@ const CheckoutPage = () => {
                 Order Summary
               </Typography>
 
-              {cart.items.map((item) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography>
+                  {product.name} x {quantity}
+                </Typography>
+                <Typography>
+                  ${(discountedPrice * quantity).toFixed(2)}
+                </Typography>
+              </Box>
+
+              {product.discount > 0 && (
                 <Box
-                  key={item.product_id}
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     mb: 1,
                   }}
                 >
-                  <Typography>
-                    {item.name} x {item.quantity}
-                  </Typography>
-                  <Typography>
-                    ${(item.price * item.quantity).toFixed(2)}
+                  <Typography>Discount:</Typography>
+                  <Typography color="success.main">
+                    -$
+                    {(
+                      product.price *
+                      (product.discount / 100) *
+                      quantity
+                    ).toFixed(2)}
                   </Typography>
                 </Box>
-              ))}
+              )}
 
               <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid #ddd" }}>
                 <Box
@@ -180,7 +235,9 @@ const CheckoutPage = () => {
                   }}
                 >
                   <Typography>Subtotal:</Typography>
-                  <Typography>${total.toFixed(2)}</Typography>
+                  <Typography>
+                    ${(product.price * quantity).toFixed(2)}
+                  </Typography>
                 </Box>
                 <Box
                   sx={{
@@ -210,7 +267,7 @@ const CheckoutPage = () => {
                   }}
                 >
                   <Typography variant="h6">Total:</Typography>
-                  <Typography variant="h6">${total.toFixed(2)}</Typography>
+                  <Typography variant="h6">${total}</Typography>
                 </Box>
               </Box>
 
@@ -219,10 +276,17 @@ const CheckoutPage = () => {
                 color="primary"
                 fullWidth
                 sx={{ mt: 2 }}
-                onClick={handleSubmit}
+                onClick={handlePlaceOrder}
+                disabled={product.stock <= 0}
               >
                 Place Order
               </Button>
+
+              {product.stock <= 0 && (
+                <Typography color="error" sx={{ mt: 1 }}>
+                  This product is out of stock
+                </Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>
