@@ -1,14 +1,12 @@
 import { addReview } from "../../services/api";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   addToCart,
   getProductById,
   getReviewsByProductId,
 } from "../../services/api";
- 
 
 const ReviewList = ({ productId, reviews, setReviews }) => {
   const [newReview, setNewReview] = useState({
@@ -161,8 +159,6 @@ const ReviewList = ({ productId, reviews, setReviews }) => {
     </div>
   );
 };
- 
-
 
 const ProductImages = ({ product }) => {
   return (
@@ -189,7 +185,6 @@ const ProductImages = ({ product }) => {
   );
 };
 
-
 const ProductInfo = ({
   product,
   discountedPrice,
@@ -202,6 +197,7 @@ const ProductInfo = ({
   isAddingToCart,
   isPlacingOrder,
 }) => {
+    console.log("Product details", product)
   return (
     <div className="md:w-1/2">
       <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
@@ -303,7 +299,7 @@ const ProductInfo = ({
         >
           {isAddingToCart ? "Adding..." : "Add to Cart"}
         </button>
-        
+
         <button
           onClick={handlePlaceOrder}
           disabled={isPlacingOrder || product.stock <= 0}
@@ -313,7 +309,7 @@ const ProductInfo = ({
               : "bg-green-600 hover:bg-green-700 text-white"
           }`}
         >
-          {isPlacingOrder ? "Placing..." : "Buy Now"}
+          Checkout
         </button>
       </div>
 
@@ -325,7 +321,6 @@ const ProductInfo = ({
     </div>
   );
 };
-
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -344,10 +339,10 @@ const ProductDetail = () => {
         setLoading(true);
         const productResponse = await getProductById(id);
         setProduct(productResponse.data.Product);
-        
-        // const reviewsResponse = await getReviewsByProductId(id);
-        // setReviews(reviewsResponse.data);
-        
+
+        const reviewsResponse = await getReviewsByProductId(id);
+        setReviews(reviewsResponse.data);
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -403,12 +398,9 @@ const ProductDetail = () => {
   };
 
   const handlePlaceOrder = async () => {
-   navigate(`/checkout/${product._id}`)
+    navigate(`/checkout/${product._id}`);
   };
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error)
-    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   if (!product)
     return <div className="text-center py-8">Product not found</div>;
 
@@ -419,8 +411,8 @@ const ProductDetail = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
         <ProductImages product={product} />
-        
-        <ProductInfo 
+
+        <ProductInfo
           product={product}
           discountedPrice={discountedPrice}
           quantity={quantity}
@@ -432,35 +424,6 @@ const ProductDetail = () => {
           isAddingToCart={isAddingToCart}
           isPlacingOrder={isPlacingOrder}
         />
-      </div>
-
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-4">Product Details</h2>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-gray-700">
-            {product.description || "No description available."}
-          </p>
-          <ul className="mt-4 space-y-2">
-            {product.features?.map((feature, index) => (
-              <li key={index} className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       <ReviewList productId={id} reviews={reviews} setReviews={setReviews} />

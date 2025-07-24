@@ -77,12 +77,14 @@ const CheckoutPage = () => {
       };
 
       const response = await createOrder(orderData);
+
       if(response.status === 200) {
         toast.success("Order placed successfully!");
-        // navigate(`/orders/${response.data.data._id}`);
+        navigate(`/orders`);
       }
     } catch (err) {
       console.error("Error creating order:", err);
+      toast.error("Error placing order!");
     }
   };
 

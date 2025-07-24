@@ -28,7 +28,6 @@ export const updateProduct = (productId, productData) =>
   api.put(`/product/${productId}`, productData);
 export const getSellerOrders = () => api.get("/product/seller");
 
-
 export const createOrder = (orderData) => api.post("/order", orderData);
 
 export const getOrders = (orderData) => api.get("/orders");
@@ -45,13 +44,7 @@ export const getReviewsByProductId = async (productId) => {
   return response;
 };
 
-export const addReview = async (productId, reviewData) => {
-  const response = await axios.post(`/api/reviews/product/${productId}`, reviewData, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
-  return response;
-};
+export const addReview = async (productId, reviewData) =>
+  await api.post(`/review/${productId}`, reviewData);
 
 export default api;
