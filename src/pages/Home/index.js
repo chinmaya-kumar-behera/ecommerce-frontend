@@ -14,7 +14,7 @@ const HomePage = () => {
       <Typography variant="h5" paragraph>
         Discover amazing products at great prices
       </Typography>
-      {!isAuthenticated() ? (
+      {!isAuthenticated() && (
         <Button
           variant="contained"
           size="large"
@@ -24,9 +24,8 @@ const HomePage = () => {
         >
           Get Started
         </Button>
-      ) : (
-        <Products />
-      )}
+      ) }
+      <Products/>
     </div>
   );
 };

@@ -12,10 +12,11 @@ const ProductListPage = () => {
   const navigate = useNavigate();
   const { isSeller } = useAuth();
 
+  // console.log("current searchParams", searchParams.toString());
+
   // Initialize filters from URL or defaults
   const [filters, setFilters] = useState({
     brand: searchParams.get("brand") || "",
-    stock: searchParams.get("stock") || "",
     price: searchParams.get("price") || "",
     search: searchParams.get("search") || "",
     page: Number(searchParams.get("page")) || 1,
@@ -43,17 +44,26 @@ const ProductListPage = () => {
     setSearchParams(params);
 
     fetchProducts();
-  }, []);
+  }, [searchParams.toString()]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  const setParams = () => {
+    let squeryString = `?`;
+    if (filters.brand) squeryString += `brand=${filters.brand}&`;
+    if (filters.price) squeryString += `price=${filters.price}&`;
+    if (filters.search) squeryString += `search=${filters.search}&`;
+    squeryString += `page=${filters.page}&limit=${filters.limit}`;
+    navigate(squeryString);
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setFilters((prev) => ({ ...prev, page: 1 })); // Reset to first page on new search
-    fetchProducts();
+    setParams();
   };
 
   const handlePageChange = (newPage) => {
@@ -61,13 +71,13 @@ const ProductListPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-64">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <motion.div
@@ -159,114 +169,122 @@ const ProductListPage = () => {
         </form>
       </motion.div>
 
-      {products.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
-        >
-          <h3 className="text-xl font-medium text-gray-600">
-            No products found matching your criteria
-          </h3>
-          <button
-            onClick={() => setFilters({ page: 1, limit: 10 })}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Clear Filters
-          </button>
-        </motion.div>
-      ) : (
+      {!loading ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <motion.div
-                key={product._id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                whileHover={{
-                  y: -5,
-                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
-                }}
-                className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300"
-              >
-                {product.image && (
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <div className="p-5">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    {product.name}
-                  </h3>
-                  <div className="space-y-1 text-gray-600 mb-4">
-                    <p className="flex items-center">
-                      <span className="font-medium">Brand:</span>{" "}
-                      {product.brand}
-                    </p>
-                    <p className="flex items-center">
-                      <span className="font-medium">Price:</span> $
-                      {product.price.toFixed(2)}
-                    </p>
-                    <p className="flex items-center">
-                      <span className="font-medium">Stock:</span>{" "}
-                      {product.stock}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Link
-                      to={`/products/${product._id}`}
-                      className="flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex-1"
-                    >
-                      <FiEye className="mr-2" />
-                      View
-                    </Link>
-                    {isSeller() && (
-                      <Link
-                        to={`/products/edit/${product._id}`}
-                        className="flex items-center justify-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex-1"
-                      >
-                        <FiEdit className="mr-2" />
-                        Edit
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="flex justify-center mt-8">
-            <div className="flex space-x-2">
-              {filters.page > 1 && (
-                <button
-                  onClick={() => handlePageChange(filters.page - 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  Previous
-                </button>
-              )}
+          {products.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <h3 className="text-xl font-medium text-gray-600">
+                No products found matching your criteria
+              </h3>
               <button
-                onClick={() => handlePageChange(filters.page)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                onClick={() => setFilters({ page: 1, limit: 10 })}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                {filters.page}
+                Clear Filters
               </button>
-              {products.length === filters.limit && (
-                <button
-                  onClick={() => handlePageChange(filters.page + 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  Next
-                </button>
-              )}
-            </div>
-          </div>
+            </motion.div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    whileHover={{
+                      y: -5,
+                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                    }}
+                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300"
+                  >
+                    {product.image && (
+                      <div className="h-48 overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        />
+                      </div>
+                    )}
+                    <div className="p-5">
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                        {product.name}
+                      </h3>
+                      <div className="space-y-1 text-gray-600 mb-4">
+                        <p className="flex items-center">
+                          <span className="font-medium">Brand:</span>{" "}
+                          {product.brand}
+                        </p>
+                        <p className="flex items-center">
+                          <span className="font-medium">Price:</span> $
+                          {product.price.toFixed(2)}
+                        </p>
+                        <p className="flex items-center">
+                          <span className="font-medium">Stock:</span>{" "}
+                          {product.stock}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Link
+                          to={`/products/${product._id}`}
+                          className="flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex-1"
+                        >
+                          <FiEye className="mr-2" />
+                          View
+                        </Link>
+                        {isSeller() && (
+                          <Link
+                            to={`/products/edit/${product._id}`}
+                            className="flex items-center justify-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex-1"
+                          >
+                            <FiEdit className="mr-2" />
+                            Edit
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="flex justify-center mt-8">
+                <div className="flex space-x-2">
+                  {filters.page > 1 && (
+                    <button
+                      onClick={() => handlePageChange(filters.page - 1)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handlePageChange(filters.page)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                  >
+                    {filters.page}
+                  </button>
+                  {products.length === filters.limit && (
+                    <button
+                      onClick={() => handlePageChange(filters.page + 1)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}{" "}
         </>
+      ) : (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
       )}
     </motion.div>
   );

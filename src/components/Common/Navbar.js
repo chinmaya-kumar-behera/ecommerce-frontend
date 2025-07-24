@@ -21,13 +21,6 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <Link
-              to="/products"
-              className="hover:text-blue-200 transition duration-150"
-            >
-              Products
-            </Link>
-
             {isAuthenticated() && (
               <>
                 <Link
