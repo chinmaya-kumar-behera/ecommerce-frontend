@@ -14,7 +14,6 @@ import SellerOrdersPage from "./pages/Order/SellerOrders";
 import ProfilePage from "./pages/User/UserProfile";
 import UnauthorizedPage from "./pages/Unauthorized";
 import Navbar from "./components/Common/Navbar";
-import Products from "./pages/Product/Products";
 import { AuthProvider } from "./context/AuthContext";
 import ProductDetail from "./pages/Product/ProductDetail";
 
@@ -27,7 +26,6 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          {/* <Route path="/products" element={<Products />} /> */}
           <Route path="/products/:id" element={<ProductDetail />} />
 
           <Route element={<PrivateRoute />}>
