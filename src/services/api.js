@@ -39,10 +39,8 @@ export const getCartItems = () => api.get("/cart/items");
 
 // services/api.js
 
-export const getReviewsByProductId = async (productId) => {
-  const response = await axios.get(`/api/reviews/product/${productId}`);
-  return response;
-};
+export const getReviewsByProductId = async (productId) =>
+  await api.get(`/review/${productId}`);
 
 export const addReview = async (productId, reviewData) =>
   await api.post(`/review/${productId}`, reviewData);

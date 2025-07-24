@@ -56,7 +56,6 @@ const CheckoutPage = () => {
     }
   };
 
-  console.log("user state", isAuthenticated);
   const handlePlaceOrder = async () => {
     try {
       if (!isAuthenticated()) {

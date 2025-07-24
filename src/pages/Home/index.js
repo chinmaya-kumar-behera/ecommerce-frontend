@@ -1,7 +1,7 @@
 import { Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
-// import { useAuth } from "../../../context/AuthContext";
 import { useAuth } from "../../context/AuthContext";
+import ProductListPage from "../Product/ProductList";
 
 const HomePage = () => {
   const { isAuthenticated } = useAuth();
@@ -14,7 +14,7 @@ const HomePage = () => {
       <Typography variant="h5" paragraph>
         Discover amazing products at great prices
       </Typography>
-      {!isAuthenticated() && (
+      {!isAuthenticated() ? (
         <Button
           variant="contained"
           size="large"
@@ -24,16 +24,9 @@ const HomePage = () => {
         >
           Get Started
         </Button>
+      ) : (
+        <ProductListPage />
       )}
-      <Button
-        variant="outlined"
-        size="large"
-        component={Link}
-        to="/products"
-        sx={{ mt: 2, ml: 2 }}
-      >
-        Browse Products
-      </Button>
     </div>
   );
 };

@@ -5,16 +5,16 @@ import PrivateRoute from "./routes/PrivateRoute";
 import HomePage from "./pages/Home";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
-import ProductCreatePage from "./pages/Product/Create";
-import ProductEditPage from "./pages/Product/Edit";
+import ProductCreatePage from "./pages/Product/CreateProduct";
+import ProductEditPage from "./pages/Product/EditProduct";
 import CartPage from "./pages/Cart";
-import CheckoutPage from "./pages/Order/Checkout";
-import OrdersPage from "./pages/Order/List";
+import CheckoutPage from "./pages/Order/ProductCheckout";
+import OrdersPage from "./pages/Order/OrderList";
 import SellerOrdersPage from "./pages/Order/SellerOrders";
-import ProfilePage from "./pages/User/Profile";
+import ProfilePage from "./pages/User/UserProfile";
 import UnauthorizedPage from "./pages/Unauthorized";
 import Navbar from "./components/Common/Navbar";
-import ProductListPage from "./pages/Product/List";
+import ProductListPage from "./pages/Product/ProductList";
 import { AuthProvider } from "./context/AuthContext";
 import ProductDetail from "./pages/Product/ProductDetail";
 
@@ -33,7 +33,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout/:id" element={<CheckoutPage />} />
+            <Route path="/checkout/:id " element={<CheckoutPage />} />
             <Route path="/orders" element={<OrdersPage />} />
           </Route>
 
