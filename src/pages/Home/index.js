@@ -1,7 +1,7 @@
 import { Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import ProductListPage from "../Product/ProductList";
+import Products from "../Product/Products";
 
 const HomePage = () => {
   const { isAuthenticated } = useAuth();
@@ -19,13 +19,13 @@ const HomePage = () => {
           variant="contained"
           size="large"
           component={Link}
-          to="/register"
+          to="/login"
           sx={{ mt: 2 }}
         >
           Get Started
         </Button>
       ) : (
-        <ProductListPage />
+        <Products />
       )}
     </div>
   );
